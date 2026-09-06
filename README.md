@@ -2,7 +2,7 @@
 
 ![Unity](https://img.shields.io/badge/Unity-6.5.10f1-000000?logo=unity&logoColor=white)
 ![C%23](https://img.shields.io/badge/C%23-Unity-512BD4?logo=csharp&logoColor=white)
-![Status](https://img.shields.io/badge/status-prototype-informational)
+![Status](https://img.shields.io/badge/status-initial%20scope%20complete-success)
 ![AI Assisted](https://img.shields.io/badge/development-AI%20assisted-blueviolet)
 
 **ClickSnake** is a small 2D Unity game inspired by the classic Snake formula, with one major twist:
@@ -13,7 +13,7 @@ Instead, the player moves exactly one grid cell at a time using **WASD**.
 
 This changes the traditional reflex-based Snake gameplay into a more deliberate positioning game where every move matters. The challenge comes from growing the snake, managing increasingly limited space, reacting to progressively shorter food timers, and avoiding situations where no valid move remains.
 
-ClickSnake was created as a hands-on introduction to game development with **Unity and C#**.
+ClickSnake was created as a hands-on introduction to game development with **Unity and C#**, with a deliberately small scope that could be completed quickly and used to explore core game-development concepts.
 
 ---
 
@@ -239,7 +239,7 @@ Bad Food introduces an additional risk later in the run.
 
 It does not appear at the beginning of the game.
 
-### Unlock condition
+### Unlock Condition
 
 Bad Food becomes eligible after:
 
@@ -264,7 +264,7 @@ Bad Food     = -2 score
 
 Therefore, score cannot be used as a reliable count of how many good foods were collected.
 
-### Spawn chance
+### Spawn Chance
 
 After the player has collected at least 8 good foods:
 
@@ -282,7 +282,7 @@ If the 50% roll fails, Bad Food remains hidden for that cycle.
 
 Bad Food does not remain permanently active.
 
-### Bad Food penalty
+### Bad Food Penalty
 
 Collecting Bad Food:
 
@@ -309,7 +309,7 @@ The score can never go below:
 0
 ```
 
-### After collecting Bad Food
+### After Collecting Bad Food
 
 When Bad Food is collected:
 
@@ -347,7 +347,7 @@ The timer never becomes shorter than:
 3 seconds
 ```
 
-## Timer progression
+## Timer Progression
 
 Example:
 
@@ -363,7 +363,7 @@ Example:
 
 The time limit decreases only when the player successfully collects good food.
 
-## Food timeout
+## Food Timeout
 
 If the timer reaches zero before the player collects the food:
 
@@ -453,7 +453,7 @@ Score is always clamped to a minimum of:
 
 Difficulty increases naturally throughout a run.
 
-### 1. Snake growth
+### 1. Snake Growth
 
 Every good food increases snake length.
 
@@ -463,7 +463,7 @@ A longer snake means:
 - more opportunities to block yourself;
 - more difficult navigation.
 
-### 2. Progressive timer
+### 2. Progressive Timer
 
 The player starts with 20 seconds per food.
 
@@ -490,7 +490,7 @@ The player must then consider both:
 - where to go;
 - what to avoid.
 
-### 4. Self-trapping
+### 4. Self-Trapping
 
 The final challenge is not hitting something.
 
@@ -700,9 +700,15 @@ Assets/Scenes/Game.unity
 
 ---
 
-# Current Development Status
+# Project Status
 
-## Gameplay
+**ClickSnake is considered complete for its original learning scope.**
+
+The main gameplay loop and the mechanics planned for the initial version are implemented and playable.
+
+The project may receive additional improvements in the future, but there is **no fixed roadmap or maintenance schedule**.
+
+## Implemented
 
 - [x] Grid-based manual movement
 - [x] WASD input
@@ -723,42 +729,21 @@ Assets/Scenes/Game.unity
 - [x] Random Bad Food spawning
 - [x] Progressive difficulty
 
-## Still Planned
+## Possible Future Ideas
 
-- [ ] Final visual polish
-- [ ] Custom snake artwork
-- [ ] Custom food artwork
-- [ ] Improved board visuals
-- [ ] Sound effects
-- [ ] Collection feedback
-- [ ] Particles
-- [ ] Improved Game Over screen
-- [ ] Gameplay balancing
-- [ ] Packaged playable build
+If I decide to revisit the project, some possible improvements include:
 
----
+- custom snake and food artwork;
+- improved board visuals;
+- sound effects;
+- food collection animations;
+- score feedback effects;
+- particles;
+- UI improvements;
+- further gameplay balancing;
+- a packaged playable build.
 
-# Planned Polish
-
-The remaining work is mostly related to presentation and game feel.
-
-Possible improvements include:
-
-- custom snake head and body sprites;
-- proper fruit sprites;
-- distinctive Bad Food artwork;
-- improved background and walls;
-- food collection animation;
-- score popups;
-- visual feedback for negative score;
-- sound for Normal Food;
-- special sound for yellow food;
-- negative sound for Bad Food;
-- Game Over audio;
-- particle effects;
-- improved UI;
-- subtle screen effects;
-- balancing timer progression and Bad Food frequency.
+These are ideas rather than commitments. The original project scope is already considered complete.
 
 ---
 
