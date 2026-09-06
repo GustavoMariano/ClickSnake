@@ -4,6 +4,14 @@ using UnityEngine.InputSystem;
 
 public class SnakeHeadController : MonoBehaviour
 {
+    private static readonly Vector2Int[] Directions =
+    {
+        Vector2Int.up,
+        Vector2Int.down,
+        Vector2Int.left,
+        Vector2Int.right
+    };
+
     [SerializeField] private int _minX = -7;
     [SerializeField] private int _maxX = 7;
     [SerializeField] private int _minY = -4;
@@ -25,6 +33,9 @@ public class SnakeHeadController : MonoBehaviour
 
     private void Update()
     {
+        if (_gameManager != null && _gameManager.IsGameOver)
+            return;
+
         Vector2Int direction = GetDirection();
 
         if (direction == Vector2Int.zero)
@@ -54,10 +65,7 @@ public class SnakeHeadController : MonoBehaviour
     {
         Vector2Int newPosition = _gridPosition + direction;
 
-        if (!IsInsideBoard(newPosition))
-            return;
-
-        if (IsBodyPosition(newPosition))
+        if (!CanMoveTo(newPosition))
             return;
 
         Vector2Int previousPosition = _gridPosition;
@@ -72,6 +80,25 @@ public class SnakeHeadController : MonoBehaviour
         Vector2Int tailPreviousPosition = MoveBody(previousPosition);
 
         CheckFood(tailPreviousPosition);
+
+        if (!HasAvailableMove())
+            _gameManager?.GameOver();
+    }
+
+    private bool CanMoveTo(Vector2Int position)
+    {
+        return IsInsideBoard(position) && !IsBodyPosition(position);
+    }
+
+    private bool HasAvailableMove()
+    {
+        foreach (Vector2Int direction in Directions)
+        {
+            if (CanMoveTo(_gridPosition + direction))
+                return true;
+        }
+
+        return false;
     }
 
     private bool IsInsideBoard(Vector2Int position)
