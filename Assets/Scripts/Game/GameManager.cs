@@ -9,14 +9,17 @@ public class GameManager : MonoBehaviour
     [SerializeField] private TMP_Text _finalScoreText;
 
     private int _score;
+    private int _goodFoodsCollected;
     private bool _isGameOver;
 
     public int Score => _score;
+    public int GoodFoodsCollected => _goodFoodsCollected;
     public bool IsGameOver => _isGameOver;
 
     private void Awake()
     {
         _score = 0;
+        _goodFoodsCollected = 0;
         _isGameOver = false;
 
         if (_gameOverPanel != null)
@@ -27,8 +30,13 @@ public class GameManager : MonoBehaviour
 
     public void AddScore(int amount)
     {
-        _score += amount;
+        _score = Mathf.Max(0, _score + amount);
         UpdateScoreText();
+    }
+
+    public void RegisterGoodFoodCollected()
+    {
+        _goodFoodsCollected++;
     }
 
     public void GameOver()

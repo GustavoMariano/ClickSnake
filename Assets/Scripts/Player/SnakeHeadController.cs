@@ -4,6 +4,9 @@ using UnityEngine.InputSystem;
 
 public class SnakeHeadController : MonoBehaviour
 {
+    private const int BadFoodSpawnThreshold = 8;
+    private const int BadFoodScorePenalty = 2;
+    private const float BadFoodSpawnChance = 0.5f;
     private const float InitialFoodTime = 20f;
     private const float FoodTimeDecrease = 0.5f;
     private const float MinimumFoodTime = 3f;
@@ -22,20 +25,26 @@ public class SnakeHeadController : MonoBehaviour
     [SerializeField] private int _maxY = 4;
 
     [SerializeField] private FoodController _food;
+    [SerializeField] private BadFoodController _badFood;
     [SerializeField] private GameManager _gameManager;
     [SerializeField] private Transform _bodySegmentPrefab;
     [SerializeField] private List<Transform> _bodySegments = new();
 
     private Vector2Int _gridPosition;
     private int _pendingGrowth;
+    private bool _badFoodActive;
     private float _currentFoodTimeLimit;
     private float _foodTimeRemaining;
 
     private void Awake()
     {
         _pendingGrowth = 0;
+        _badFoodActive = false;
         _currentFoodTimeLimit = InitialFoodTime;
         ResetFoodTimer();
+
+        if (_badFood != null)
+            _badFood.gameObject.SetActive(false);
 
         _gridPosition = new Vector2Int(
             Mathf.RoundToInt(transform.position.x),
@@ -91,18 +100,12 @@ public class SnakeHeadController : MonoBehaviour
             0);
 
         Vector2Int tailPreviousPosition = MoveBody(previousPosition);
-        bool collectedFood = CheckFood();
-
         ApplyPendingGrowth(tailPreviousPosition);
 
-        if (collectedFood)
-        {
-            _currentFoodTimeLimit = Mathf.Max(
-                MinimumFoodTime,
-                _currentFoodTimeLimit - FoodTimeDecrease);
-
-            RespawnFood();
-        }
+        if (IsGoodFoodAtHead())
+            CollectGoodFood();
+        else if (IsBadFoodAtHead())
+            CollectBadFood();
 
         if (!HasAvailableMove())
             _gameManager?.GameOver();
@@ -169,18 +172,38 @@ public class SnakeHeadController : MonoBehaviour
         return tailPreviousPosition;
     }
 
-    private bool CheckFood()
+    private bool IsGoodFoodAtHead()
     {
-        if (_food == null)
-            return false;
+        return _food != null && _gridPosition == _food.GridPosition;
+    }
 
-        if (_gridPosition != _food.GridPosition)
-            return false;
+    private bool IsBadFoodAtHead()
+    {
+        return _badFoodActive &&
+               _badFood != null &&
+               _gridPosition == _badFood.GridPosition;
+    }
 
+    private void CollectGoodFood()
+    {
         Grow(_food.GrowthAmount);
         _gameManager?.AddScore(_food.ScoreAmount);
+        _gameManager?.RegisterGoodFoodCollected();
 
-        return true;
+        _currentFoodTimeLimit = Mathf.Max(
+            MinimumFoodTime,
+            _currentFoodTimeLimit - FoodTimeDecrease);
+
+        RespawnFood();
+        RollBadFoodForNextCycle();
+    }
+
+    private void CollectBadFood()
+    {
+        _gameManager?.AddScore(-BadFoodScorePenalty);
+
+        RespawnFood();
+        SetBadFoodActive(false);
     }
 
     private void UpdateFoodTimer()
@@ -204,9 +227,50 @@ public class SnakeHeadController : MonoBehaviour
             _maxX,
             _minY,
             _maxY,
-            GetOccupiedPositions());
+            GetOccupiedPositionsIncludingBadFood());
 
         ResetFoodTimer();
+    }
+
+    private void RollBadFoodForNextCycle()
+    {
+        if (_badFood == null)
+            return;
+
+        bool shouldSpawn =
+            _gameManager != null &&
+            _gameManager.GoodFoodsCollected >= BadFoodSpawnThreshold &&
+            Random.value < BadFoodSpawnChance;
+
+        if (!shouldSpawn)
+        {
+            SetBadFoodActive(false);
+            return;
+        }
+
+        HashSet<Vector2Int> occupiedPositions = GetOccupiedPositions();
+
+        if (_food != null)
+            occupiedPositions.Add(_food.GridPosition);
+
+        occupiedPositions.Add(_badFood.GridPosition);
+
+        bool movedToValidPosition = _badFood.MoveToRandomPosition(
+            _minX,
+            _maxX,
+            _minY,
+            _maxY,
+            occupiedPositions);
+
+        SetBadFoodActive(movedToValidPosition);
+    }
+
+    private void SetBadFoodActive(bool isActive)
+    {
+        _badFoodActive = isActive;
+
+        if (_badFood != null)
+            _badFood.gameObject.SetActive(isActive);
     }
 
     private void ResetFoodTimer()
@@ -253,6 +317,19 @@ public class SnakeHeadController : MonoBehaviour
 
             occupiedPositions.Add(segmentPosition);
         }
+
+        return occupiedPositions;
+    }
+
+    private HashSet<Vector2Int> GetOccupiedPositionsIncludingBadFood()
+    {
+        HashSet<Vector2Int> occupiedPositions = GetOccupiedPositions();
+
+        if (_food != null)
+            occupiedPositions.Add(_food.GridPosition);
+
+        if (_badFoodActive && _badFood != null)
+            occupiedPositions.Add(_badFood.GridPosition);
 
         return occupiedPositions;
     }

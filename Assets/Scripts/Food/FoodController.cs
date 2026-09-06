@@ -39,24 +39,16 @@ public class FoodController : MonoBehaviour
         int maxY,
         HashSet<Vector2Int> occupiedPositions)
     {
-        List<Vector2Int> availablePositions = new();
-
-        for (int x = minX; x <= maxX; x++)
+        if (!GridPositionUtility.TryGetRandomAvailablePosition(
+                minX,
+                maxX,
+                minY,
+                maxY,
+                occupiedPositions,
+                out Vector2Int newPosition))
         {
-            for (int y = minY; y <= maxY; y++)
-            {
-                Vector2Int position = new(x, y);
-
-                if (!occupiedPositions.Contains(position))
-                    availablePositions.Add(position);
-            }
-        }
-
-        if (availablePositions.Count == 0)
             return false;
-
-        Vector2Int newPosition =
-            availablePositions[Random.Range(0, availablePositions.Count)];
+        }
 
         transform.position = new Vector3(
             newPosition.x,
