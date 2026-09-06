@@ -940,7 +940,7 @@ MonoBehaviour:
   _minY: -4
   _maxY: 4
   _food: {fileID: 1069077623}
-  _bodySegmentPrefab: {fileID: 0}
+  _bodySegmentPrefab: {fileID: 2006846622}
   _bodySegments:
   - {fileID: 2006846622}
 --- !u!1 &1310995979

@@ -10,6 +10,7 @@ public class SnakeHeadController : MonoBehaviour
     [SerializeField] private int _maxY = 4;
 
     [SerializeField] private FoodController _food;
+    [SerializeField] private GameManager _gameManager;
     [SerializeField] private Transform _bodySegmentPrefab;
     [SerializeField] private List<Transform> _bodySegments = new();
 
@@ -127,6 +128,7 @@ public class SnakeHeadController : MonoBehaviour
             return;
 
         Grow(newSegmentPosition);
+        _gameManager?.AddScore(1);
 
         _food.MoveToRandomPosition(
             _minX,
