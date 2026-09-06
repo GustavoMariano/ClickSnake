@@ -4,6 +4,10 @@ using UnityEngine.InputSystem;
 
 public class SnakeHeadController : MonoBehaviour
 {
+    private const float InitialFoodTime = 20f;
+    private const float FoodTimeDecrease = 0.5f;
+    private const float MinimumFoodTime = 3f;
+
     private static readonly Vector2Int[] Directions =
     {
         Vector2Int.up,
@@ -24,10 +28,14 @@ public class SnakeHeadController : MonoBehaviour
 
     private Vector2Int _gridPosition;
     private int _pendingGrowth;
+    private float _currentFoodTimeLimit;
+    private float _foodTimeRemaining;
 
     private void Awake()
     {
         _pendingGrowth = 0;
+        _currentFoodTimeLimit = InitialFoodTime;
+        ResetFoodTimer();
 
         _gridPosition = new Vector2Int(
             Mathf.RoundToInt(transform.position.x),
@@ -38,6 +46,8 @@ public class SnakeHeadController : MonoBehaviour
     {
         if (_gameManager != null && _gameManager.IsGameOver)
             return;
+
+        UpdateFoodTimer();
 
         Vector2Int direction = GetDirection();
 
@@ -87,12 +97,11 @@ public class SnakeHeadController : MonoBehaviour
 
         if (collectedFood)
         {
-            _food.MoveToRandomPosition(
-                _minX,
-                _maxX,
-                _minY,
-                _maxY,
-                GetOccupiedPositions());
+            _currentFoodTimeLimit = Mathf.Max(
+                MinimumFoodTime,
+                _currentFoodTimeLimit - FoodTimeDecrease);
+
+            RespawnFood();
         }
 
         if (!HasAvailableMove())
@@ -172,6 +181,37 @@ public class SnakeHeadController : MonoBehaviour
         _gameManager?.AddScore(_food.ScoreAmount);
 
         return true;
+    }
+
+    private void UpdateFoodTimer()
+    {
+        if (_food == null)
+            return;
+
+        _foodTimeRemaining -= Time.deltaTime;
+
+        if (_foodTimeRemaining <= 0f)
+            RespawnFood();
+    }
+
+    private void RespawnFood()
+    {
+        if (_food == null)
+            return;
+
+        _food.MoveToRandomPosition(
+            _minX,
+            _maxX,
+            _minY,
+            _maxY,
+            GetOccupiedPositions());
+
+        ResetFoodTimer();
+    }
+
+    private void ResetFoodTimer()
+    {
+        _foodTimeRemaining = _currentFoodTimeLimit;
     }
 
     private void Grow(int amount)
