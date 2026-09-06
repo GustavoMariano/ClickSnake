@@ -168,8 +168,8 @@ public class SnakeHeadController : MonoBehaviour
         if (_gridPosition != _food.GridPosition)
             return false;
 
-        Grow(1);
-        _gameManager?.AddScore(1);
+        Grow(_food.GrowthAmount);
+        _gameManager?.AddScore(_food.ScoreAmount);
 
         return true;
     }
