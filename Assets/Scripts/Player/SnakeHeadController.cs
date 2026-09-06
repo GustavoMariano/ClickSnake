@@ -23,9 +23,12 @@ public class SnakeHeadController : MonoBehaviour
     [SerializeField] private List<Transform> _bodySegments = new();
 
     private Vector2Int _gridPosition;
+    private int _pendingGrowth;
 
     private void Awake()
     {
+        _pendingGrowth = 0;
+
         _gridPosition = new Vector2Int(
             Mathf.RoundToInt(transform.position.x),
             Mathf.RoundToInt(transform.position.y));
@@ -78,8 +81,19 @@ public class SnakeHeadController : MonoBehaviour
             0);
 
         Vector2Int tailPreviousPosition = MoveBody(previousPosition);
+        bool collectedFood = CheckFood();
 
-        CheckFood(tailPreviousPosition);
+        ApplyPendingGrowth(tailPreviousPosition);
+
+        if (collectedFood)
+        {
+            _food.MoveToRandomPosition(
+                _minX,
+                _maxX,
+                _minY,
+                _maxY,
+                GetOccupiedPositions());
+        }
 
         if (!HasAvailableMove())
             _gameManager?.GameOver();
@@ -146,27 +160,33 @@ public class SnakeHeadController : MonoBehaviour
         return tailPreviousPosition;
     }
 
-    private void CheckFood(Vector2Int newSegmentPosition)
+    private bool CheckFood()
     {
         if (_food == null)
-            return;
+            return false;
 
         if (_gridPosition != _food.GridPosition)
-            return;
+            return false;
 
-        Grow(newSegmentPosition);
+        Grow(1);
         _gameManager?.AddScore(1);
 
-        _food.MoveToRandomPosition(
-            _minX,
-            _maxX,
-            _minY,
-            _maxY,
-            GetOccupiedPositions());
+        return true;
     }
 
-    private void Grow(Vector2Int position)
+    private void Grow(int amount)
     {
+        if (amount <= 0)
+            return;
+
+        _pendingGrowth += amount;
+    }
+
+    private void ApplyPendingGrowth(Vector2Int position)
+    {
+        if (_pendingGrowth <= 0)
+            return;
+
         Transform newSegment = Instantiate(
             _bodySegmentPrefab,
             new Vector3(position.x, position.y, 0),
@@ -175,6 +195,7 @@ public class SnakeHeadController : MonoBehaviour
         newSegment.name = $"SnakeBody_{_bodySegments.Count + 1}";
 
         _bodySegments.Add(newSegment);
+        _pendingGrowth--;
     }
 
     private HashSet<Vector2Int> GetOccupiedPositions()
