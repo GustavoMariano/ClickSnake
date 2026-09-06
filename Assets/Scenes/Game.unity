@@ -1037,6 +1037,7 @@ GameObject:
   m_Component:
   - component: {fileID: 690783954}
   - component: {fileID: 690783953}
+  - component: {fileID: 690783955}
   m_Layer: 0
   m_Name: BadFood
   m_TagString: Untagged
@@ -1119,6 +1120,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &690783955
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 690783952}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 53454cb17faae264d9f5baba2f02ebbd, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BadFoodController
 --- !u!1 &934215323
 GameObject:
   m_ObjectHideFlags: 0
@@ -1518,6 +1531,7 @@ MonoBehaviour:
   _minY: -4
   _maxY: 4
   _food: {fileID: 1069077623}
+  _badFood: {fileID: 690783955}
   _gameManager: {fileID: 1543353251}
   _bodySegmentPrefab: {fileID: 2006846622}
   _bodySegments:
